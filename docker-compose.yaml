@@ -1,0 +1,27 @@
+version: '3.0.9'
+
+services:
+  mongoDB:
+    container_name: mongodb
+    image: mongo:latest
+    restart: always
+    networks:
+      - default
+    ports:
+      - "27017:27017"
+    volumes: 
+      - mongoDB:/data/db
+  
+  # Golang api service
+  api:
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      PORT: 8000
+      SECRET_KEY: PRAVEEN08
+      MONGO_URI: mongodb://mongoDB:27017
+    depends_on:
+      - mongoDB
+volumes:
+  mongoDB: {}
