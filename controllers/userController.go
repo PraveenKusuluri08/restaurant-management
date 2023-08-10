@@ -8,14 +8,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Praveenkusuluri08/database"
-	"github.com/Praveenkusuluri08/helpers"
-	"github.com/Praveenkusuluri08/models"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/net/context"
+
+	"github.com/Praveenkusuluri08/database"
+	"github.com/Praveenkusuluri08/helpers"
+	"github.com/Praveenkusuluri08/models"
 )
 
 var userCollection = database.CreateCollection(database.Client, "users")
@@ -39,11 +40,11 @@ func GetUsers() gin.HandlerFunc {
 
 		matchStage := bson.D{{"$match", bson.D{{}}}}
 		// projectStage := bson.D{
-			// {"$project", bson.D{
-			// 	{"_id", 0},
-			// 	 {"total_count", 1},
-			// 	{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordPerPage}}}},
-			// }}}
+		// {"$project", bson.D{
+		// 	{"_id", 0},
+		// 	 {"total_count", 1},
+		// 	{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordPerPage}}}},
+		// }}}
 		projectStage := bson.D{{"$project", bson.D{
 			{"password", 0},
 		}}}
@@ -85,32 +86,32 @@ func GetUser() gin.HandlerFunc {
 	}
 }
 
-func GetUserByEmail() gin.HandlerFunc{
+func GetUserByEmail() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user bson.M
 		var singleUser []primitive.M
-		ctx,cancel:= context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 
-		email:= c.Param("email")
+		email := c.Param("email")
 
 		defer cancel()
-		
-		count,err:= userCollection.CountDocuments(ctx, bson.M{"email": email})
-		if err!=nil{
+
+		count, err := userCollection.CountDocuments(ctx, bson.M{"email": email})
+		if err != nil {
 			log.Fatal(err)
 			panic(err.Error())
 		}
-		if count<=0{
-			c.JSON(http.StatusBadRequest,gin.H{"error":"User not exists!please make try with different email"})
+		if count <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User not exists!please make try with different email"})
 			return
 		}
-		if err=userCollection.FindOne(ctx,bson.M{"email":email}).Decode(&user);err!=nil{
+		if err = userCollection.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
 			log.Fatal(err)
 			panic(err.Error())
 		}
-		
-		singleUser=append(singleUser,user)
-		c.JSON(http.StatusOK,singleUser)
+
+		singleUser = append(singleUser, user)
+		c.JSON(http.StatusOK, singleUser)
 	}
 }
 
@@ -191,7 +192,6 @@ func SignIn() gin.HandlerFunc {
 				log.Fatalln(err.Error())
 			}
 			msg := helpers.CompareHashAndPassword(user.Password, actualUser.Password)
-			fmt.Println(msg)
 			if msg {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"message": "Email and password not matches",
@@ -200,8 +200,14 @@ func SignIn() gin.HandlerFunc {
 			}
 			token, refreshToken, _ := helpers.GenerateToken(actualUser)
 			helpers.UpdateAllTokens(token, refreshToken, actualUser.Uid)
-			fmt.Println("actualUser",actualUser)
-			c.JSON(http.StatusOK, actualUser)
+
+			c.JSON(http.StatusOK, gin.H{
+				"token":        actualUser.Token,
+				"id":           actualUser.ID,
+				"email":        actualUser.Email,
+				"role":         actualUser.Role,
+				"refreshtoken": actualUser.RefreshToken,
+			})
 		}
 
 	}

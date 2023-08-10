@@ -6,8 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/Praveenkusuluri08/database"
-	"github.com/Praveenkusuluri08/models"
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,10 +13,13 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/net/context"
+
+	"github.com/Praveenkusuluri08/database"
+	"github.com/Praveenkusuluri08/models"
 )
 
 var SECRET_KEY string = os.Getenv("SECRET_KEY")
-var userCollection *mongo.Collection = database.CreateCollection(database.Client, "User")
+var userCollection *mongo.Collection = database.CreateCollection(database.Client, "users")
 
 type SignDetails struct {
 	Email     string
@@ -63,10 +64,10 @@ func UpdateAllTokens(token string, refreshToken string, userId string) {
 	updateObj = append(updateObj, bson.E{Key: "token", Value: token})
 	updateObj = append(updateObj, bson.E{Key: "refreshToken", Value: refreshToken})
 
-	updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	updateObj = append(updateObj, bson.E{Key: "updatedAt", Value: updated_at})
+	updatedat, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	updateObj = append(updateObj, bson.E{Key: "updatedat", Value: updatedat})
 	upsert := true
-	filter := bson.M{"user_id": userId}
+	filter := bson.M{"uid": userId}
 
 	//upsert is method which is combination of insert and update
 	opt := options.UpdateOptions{
@@ -145,4 +146,8 @@ func CheckMobileNumberExists(phone string) bool {
 		return false
 	}
 	return count > 0
+}
+
+func IsAdmin(email string, uid string) {
+
 }

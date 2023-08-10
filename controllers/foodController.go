@@ -9,19 +9,19 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Praveenkusuluri08/database"
-	"github.com/Praveenkusuluri08/models"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	bson "go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/net/context"
+
+	"github.com/Praveenkusuluri08/database"
+	"github.com/Praveenkusuluri08/models"
 )
 
 var foodCollection *mongo.Collection = database.CreateCollection(database.Client, "food")
 
-var validate = validator.New()
+//var validate = validator.New()
 
 func GetFoods() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -74,6 +74,7 @@ func GetFood() gin.HandlerFunc {
 
 func CreateFood() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
 		var ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 		var menu models.Menu
 		var food models.Food
@@ -90,7 +91,7 @@ func CreateFood() gin.HandlerFunc {
 		//	return
 		//}
 
-		if err := menuCollection.FindOne(ctx, bson.M{"menu_id": food.Menu_id}).Decode(&menu); err != nil {
+		if err := menuCollection.FindOne(ctx, bson.M{"menu_id": food.MenuId}).Decode(&menu); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": err.Error(),
 			})
@@ -100,7 +101,7 @@ func CreateFood() gin.HandlerFunc {
 		food.CreatedAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		food.UpdateAt, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		food.ID = primitive.NewObjectID()
-		food.Food_id = food.ID.Hex()
+		food.FoodId = food.ID.Hex()
 		var num = toFixed(food.Price, 2)
 		food.Price = num
 		result, insertError := foodCollection.InsertOne(ctx, food)
@@ -141,11 +142,11 @@ func UpdateFood() gin.HandlerFunc {
 		if food.Price != 0.0 {
 			updateObj = append(updateObj, bson.E{"price", food.Price})
 		}
-		if food.Food_Image != "" {
-			updateObj = append(updateObj, bson.E{"food_image", food.Food_Image})
+		if food.FoodImage != "" {
+			updateObj = append(updateObj, bson.E{"food_image", food.FoodImage})
 		}
-		if food.Menu_id != "" {
-			if err := menuCollection.FindOne(ctx, bson.M{"menu_id": food.Menu_id}).Decode(&menu); err != nil {
+		if food.MenuId != "" {
+			if err := menuCollection.FindOne(ctx, bson.M{"menu_id": food.MenuId}).Decode(&menu); err != nil {
 				msg := fmt.Sprintf("message:Menu was not found")
 				c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
 				return

@@ -7,12 +7,12 @@ import (
 )
 
 type Menu struct {
-	ID         primitive.ObjectID `bson:"id"`
-	Name       string             `json:"name" validate:"required"`
-	Category   string             `json:"category" validate:"required"`
-	Start_Date time.Time          `json:"start_date" validate:"required"`
-	End_Date   time.Time          `json:"end_date" validate:"required"`
-	CreatedAt  time.Time          `json:"created_at"`
-	UpdatedAt  time.Time          `json:"updated_at"`
-	Menu_id    string             `json:"menu_id"`
+	ID        primitive.ObjectID `bson:"id" json:"id,omitempty"`
+	Name      string             `json:"name" validate:"required" json:"name,omitempty"`
+	Category  string             `json:"category" validate:"required" json:"category,omitempty"`
+	StartDate string             `json:"startDate" validate:"required" json:"startDate,omitempty"`
+	EndDate   string             `json:"endDate" validate:"required" json:"endDate,omitempty"`
+	CreatedAt time.Time          `json:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `json:"updated_at" json:"updated_at"`
+	MenuId    string             `json:"menu_id" json:"menuId,omitempty"`
 }

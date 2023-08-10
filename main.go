@@ -6,14 +6,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Praveenkusuluri08/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+
+	"github.com/Praveenkusuluri08/routes"
 )
 
 func main() {
 
-	if err := godotenv.Load(".env"); err != nil {
+	if err := godotenv.Load("config.env"); err != nil {
 		log.Fatal(err.Error(), "Failed to load env files")
 	}
 	fmt.Println(os.Getenv("MONGO_URI"))
@@ -33,7 +34,7 @@ func main() {
 	routes.UserRoutes(router)
 
 	routes.FoodRoutes(router)
-	//routes.MenuRoutes(router)
+	routes.MenuRoutes(router)
 	//routes.TableRoutes(router)
 	//routes.OrderRoutes(router)
 	//routes.OrderItemRoutes(router)
