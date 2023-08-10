@@ -2,9 +2,10 @@ package middlewares
 
 import (
 	"fmt"
-	"github.com/Praveenkusuluri08/helpers"
 	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/Praveenkusuluri08/helpers"
 )
 
 func EndPoint() gin.HandlerFunc {
@@ -22,7 +23,7 @@ func EndPoint() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"message": errMsg,
 			})
-			c.Abort()
+
 			return
 		}
 		c.Set("email", claims.Email)

@@ -3,7 +3,6 @@ FROM golang:1.18-alpine
 
 WORKDIR /usr/src/golangrms
 
-
 COPY go.mod .
 
 COPY go.sum .
